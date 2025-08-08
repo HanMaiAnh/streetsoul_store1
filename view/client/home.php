@@ -35,10 +35,138 @@ foreach ($allProducts as $product) {
 ?>
 
 <!-- Banner -->
-<div class="banner">
-    <img src="public/images/Phong-cach-Streetwear.png.jpg" alt="StreetSoul Banner" class="logo">
-    <h2>StreetSoul Collection</h2>
+<!-- Banner -->
+<style>
+  .banner {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    margin: 0;
+    overflow: hidden;
+  }
+
+  .slides {
+    display: flex;
+    height: 100%;
+    transition: transform 1s ease-in-out; /* giảm từ 2s xuống 1s */
+    will-change: transform;
+  }
+
+  .slides img {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* Hiển thị nguyên vẹn ảnh */
+  background-color: #000; /* Nền đen cho đẹp khi có khoảng trống */
+  display: block;
+}
+
+  .nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.45);
+    color: #fff;
+    border: none;
+    font-size: 1.8rem;
+    padding: 10px 14px;
+    cursor: pointer;
+    border-radius: 50%;
+    z-index: 20;
+  }
+  .nav-btn:hover { background: rgba(0,0,0,0.7); }
+  .prev { left: 16px; }
+  .next { right: 16px; }
+
+  .dots {
+    position: absolute;
+    left: 50%;
+    bottom: 12px;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 20;
+  }
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.45);
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+  .dot.active {
+    background: #fff;
+    box-shadow: 0 0 0 6px rgba(0,0,0,0.12);
+  }
+</style>
+
+<div class="banner" id="banner">
+  <div class="slides" id="slides">
+    <img src="public/images/banner1.png" alt="Banner 1">
+    <img src="public/images/banner2.png" alt="Banner 2">
+    <img src="public/images/banner3.png" alt="Banner 3">
+    <img src="public/images/banner4.png" alt="Banner 4">
+  </div>
+
+  <button class="nav-btn prev" id="prev">❮</button>
+  <button class="nav-btn next" id="next">❯</button>
+
+  <div class="dots" id="dots"></div>
 </div>
+
+<script>
+  const slidesEl = document.getElementById('slides');
+  const slides = slidesEl.children;
+  const total = slides.length;
+  const banner = document.getElementById('banner');
+
+  let index = 0;
+  const AUTOPLAY_DELAY = 6000;
+  let timer = null;
+
+  function update() {
+    // Chỉ cần index * 100% vì mỗi ảnh = 100% khung
+    slidesEl.style.transform = `translateX(-${index * 100}%)`;
+    document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === index));
+  }
+
+  function nextSlide() { index = (index + 1) % total; update(); resetTimer(); }
+  function prevSlide() { index = (index - 1 + total) % total; update(); resetTimer(); }
+  function goTo(i) { index = i % total; if (index < 0) index += total; update(); resetTimer(); }
+
+  const dotsWrap = document.getElementById('dots');
+  for (let i = 0; i < total; i++) {
+    const btn = document.createElement('button');
+    btn.className = 'dot';
+    btn.addEventListener('click', () => goTo(i));
+    dotsWrap.appendChild(btn);
+  }
+
+  document.getElementById('next').addEventListener('click', nextSlide);
+  document.getElementById('prev').addEventListener('click', prevSlide);
+
+  function startTimer() {
+    stopTimer();
+timer = setInterval(nextSlide, AUTOPLAY_DELAY);
+  }
+  function stopTimer() { if (timer) clearInterval(timer); }
+  function resetTimer() { startTimer(); }
+
+  banner.addEventListener('mouseenter', stopTimer);
+  banner.addEventListener('mouseleave', startTimer);
+
+  Array.from(slides).forEach(img => {
+    img.addEventListener('error', () => {
+      img.src = 'public/images/placeholder.jpg';
+      img.style.background = '#000';
+    });
+  });
+
+  update();
+  startTimer();
+</script>
 
 <!-- Sản phẩm nổi bật -->
 <div class="container">
