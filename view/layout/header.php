@@ -1,7 +1,4 @@
 <?php
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
 $totalCartItems = 0;
 if (isset($_SESSION['cart'])) {
     $totalCartItems = array_sum(array_column($_SESSION['cart'], 'quantity'));
@@ -36,7 +33,7 @@ if (isset($_SESSION['cart'])) {
         }
 
         .logo-img {
-            height: 50px;
+            height: 100px;
         }
 
         .nav-left a, .nav-right a, .user-name {
@@ -115,7 +112,7 @@ if (isset($_SESSION['cart'])) {
             <!-- Logo -->
             <div class="logo">
                 <a href="/streetsoul_store1/index.php">
-                    <img src="/streetsoul_store1/public/images/logoweb.jpg" alt="Logo" class="logo-img">
+                    <img src="/streetsoul_store1/public/images/logoyamy.png" alt="Logo" class="logo-img">
                 </a>
             </div>
 
