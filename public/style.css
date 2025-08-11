@@ -681,3 +681,15 @@ footer {
     }
 }
 
+.buy-now-btn {
+    background-color: #ff6600;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.buy-now-btn:hover {
+    background-color: #e65c00;
+}
