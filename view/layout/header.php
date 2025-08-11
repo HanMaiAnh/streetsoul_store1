@@ -1,4 +1,7 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 $totalCartItems = 0;
 if (isset($_SESSION['cart'])) {
     $totalCartItems = array_sum(array_column($_SESSION['cart'], 'quantity'));
