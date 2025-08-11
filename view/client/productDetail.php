@@ -105,11 +105,14 @@ $otherProducts = $productModel->getRandomProducts(4, $product['id']);
          Thêm vào giỏ hàng 
     </button>
 
-            <form id="buyNowForm" action="order.php" method="POST">
-                <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
-                <input type="hidden" name="quantity" value="1">
-                <button type="submit" class="buy-now-btn">Mua ngay</button>
-            </form>
+         <form id="buyNowForm" action="/streetsoul_store1/controller/cart.controller.php" method="POST">
+    <input type="hidden" name="action" value="buyNow">
+    <input type="hidden" name="id" value="<?= $product['id'] ?>">
+    <input type="hidden" name="name" value="<?= htmlspecialchars($product['name']) ?>">
+    <input type="hidden" name="price" value="<?= $discountedPrice ?>">
+    <input type="hidden" name="quantity" value="1">
+    <button type="submit" class="buy-now-btn">Mua ngay</button>
+</form>
 
         </div>
     </div>
