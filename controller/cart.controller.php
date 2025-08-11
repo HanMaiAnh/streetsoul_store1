@@ -46,3 +46,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         ]);
     }
 }
+if ($_POST['action'] === 'buyNow') {
+    $id = $_POST['id'];
+    $name = $_POST['name'];
+    $price = $_POST['price'];
+    $quantity = $_POST['quantity'];
+
+    // Thêm sản phẩm vào session giỏ hàng
+    if (!isset($_SESSION['cart'])) {
+        $_SESSION['cart'] = [];
+    }
+    $_SESSION['cart'][$id] = [
+        'id' => $id,
+        'name' => $name,
+        'price' => $price,
+        'quantity' => $quantity
+    ];
+
+    // Chuyển hướng sang trang đặt hàng
+    header("Location: /streetsoul_store1/view/client/order.php");
+    exit;
+}
