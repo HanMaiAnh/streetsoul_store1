@@ -80,60 +80,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-
-/*
-    $name = $_POST['name'];
-    $phone = $_POST['phone'];
-    $address = $_POST['address'];
-
-    include_once __DIR__ . "/../../config/db.php";
-    $database = new Database();
-    $conn = $database->conn;
-
-    // Thêm đơn hàng vào bảng orders
-    $query = "INSERT INTO orders (customer_name, phone, address, total_price, shipping_fee, status, created_at)
-          VALUES (?, ?, ?, ?, ?, 'Đang xử lý', NOW())";
-          
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("sssii", $name, $phone, $address, $grandTotal, $shippingFee);
-    $stmt->execute();
-
-    $order_id = $conn->insert_id;
-
-    // Thêm chi tiết đơn hàng vào bảng order_details
-    $sqlDetail = "INSERT INTO order_details (order_id, product_id, product_name, quantity, price)
-              VALUES (?, ?, ?, ?, ?)";
-
-    $stmtDetail = $conn->prepare($sqlDetail);
-
-    foreach ($_SESSION['cart'] as $item) {
-        $price = isset($item['price']) ? $item['price'] : 0;
-        $quantity = isset($item['quantity']) ? $item['quantity'] : 1;
-        $id = isset($item['id']) ? $item['id'] : 0;
-
-        // Kiểm tra sự tồn tại của sản phẩm trong bảng products trước khi thêm vào order_details
-        $sqlCheckProduct = "SELECT id FROM products WHERE id = ?";
-        $stmtCheckProduct = $conn->prepare($sqlCheckProduct);
-        $stmtCheckProduct->bind_param("i", $id);
-        $stmtCheckProduct->execute();
-        $resultCheckProduct = $stmtCheckProduct->get_result();
-
-        if ($resultCheckProduct->num_rows > 0) {
-            // Nếu sản phẩm tồn tại trong bảng products, thêm chi tiết đơn hàng vào order_details
-            $stmtDetail->bind_param("iiid", $order_id, $id, $quantity, $price);
-            $stmtDetail->execute();
-        } else {
-            // Nếu sản phẩm không tồn tại, bạn có thể thêm thông báo lỗi hoặc bỏ qua sản phẩm đó
-            echo "Sản phẩm có id $id không tồn tại trong cơ sở dữ liệu.";
-        }
-    }
-
-    // Xóa giỏ hàng sau khi đặt hàng
-    unset($_SESSION['cart']);
-
-    header('Location: order-success.php');
-    exit();
-    */
 }
 ?>
 
@@ -162,7 +108,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $subtotal = $price * $quantity;
                 ?>
                 <tr>
-                    <td><img src="images/<?php echo $image; ?>" width="50" alt="<?php echo $name; ?>"></td>
+                    <td>
+                    <img src="../<?php echo htmlspecialchars($image); ?>" width="50" alt="<?php echo htmlspecialchars($name); ?>">
+                    </td>
                     <td><?php echo $name; ?></td>
                     <td><?php echo $quantity; ?></td>
                     <td><?php echo number_format($price); ?> VNĐ</td>
@@ -174,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <!-- Form nhập thông tin đặt hàng -->
-    <form method="POST" action="">
+    <form action="process_order.php" method="POST">
         <div>
             <label for="name">Họ và tên:</label>
             <input type="text" id="name" name="name" required>
@@ -187,6 +135,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="address">Địa chỉ:</label>
             <input type="text" id="address" name="address" required>
         </div>
+         <input type="hidden" name="total" value="<?= $total ?>">
+
 
         <div>
             <p>Phí vận chuyển: <?php echo number_format($shippingFee); ?> VNĐ</p>
@@ -206,4 +156,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </form>
 </div>
 
-<?php include __DIR__ . "/../layout/footer.php"; ?>
+<?php include __DIR__ . "/../layout/footer.php"; ?> */
