@@ -14,9 +14,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $stmt->execute([$tendangnhap, $matkhau]);
 
         if ($stmt->rowCount() === 1) {
-            // Đăng nhập thành công
             $_SESSION['user'] = $stmt->fetch(PDO::FETCH_ASSOC);
-            header("Location:/streetsoul_store1/index.php"); // 👉 Quay về trang chủ
+            header("Location:/streetsoul_store1/index.php");
             exit;
         } else {
             $error = "Sai tên đăng nhập hoặc mật khẩu!";
@@ -27,28 +26,69 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 ?>
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 
-<form method="POST" style="width: 50%; margin: auto; margin-top: 50px;" class="border border-info border-2 rounded p-4">
-  <h3 class="text-center mb-4">Đăng nhập</h3>
+<!-- Modal Đăng nhập -->
+<div class="modal fade show" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true" style="display:block;">
+  <div class="modal-dialog">
+    <form action="" method="POST" class="modal-content p-4">
+      
+      <!-- Tiêu đề -->
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold" id="loginModalLabel">Đăng nhập</h5>
+        <a href="/streetsoul_store1/index.php" class="btn-close"></a>
+      </div>
 
-  <?php if (!empty($error)): ?>
-    <div class="alert alert-danger"><?= $error ?></div>
-  <?php endif; ?>
+      <div class="modal-body">
 
-  <div class="mb-3">
-    <label for="tendangnhap" class="form-label">Tên đăng nhập</label>
-    <input type="text" class="form-control" id="tendangnhap" name="tendangnhap" required>
+        <!-- Nút đăng nhập Facebook -->
+        <a href="#" class="btn w-100 mb-2 text-white" style="background-color: #3b5998;">
+          <i class="bi bi-facebook me-2"></i> Đăng nhập bằng Facebook
+        </a>
+
+        <!-- Nút đăng nhập Google -->
+        <a href="#" class="btn w-100 mb-4 text-white" style="background-color: #db4437;">
+          <i class="bi bi-google me-2"></i> Đăng nhập bằng Google
+        </a>
+
+        <!-- Hiển thị lỗi -->
+        <?php if (!empty($error)): ?>
+            <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+        <?php endif; ?>
+
+        <!-- Tài khoản -->
+        <div class="mb-3">
+          <label for="username" class="form-label">Tài khoản</label>
+          <input type="text" id="username" class="form-control" name="tendangnhap" required>
+        </div>
+
+        <!-- Mật khẩu -->
+        <div class="mb-3">
+          <label for="password" class="form-label">Mật khẩu</label>
+          <input type="password" id="password" class="form-control" name="matkhau" required>
+        </div>
+
+        <!-- Ghi nhớ -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="rememberMe">
+<label for="rememberMe" class="form-check-label">Ghi nhớ tài khoản</label>
+          </div>
+        </div>
+
+        <!-- Nút đăng nhập -->
+        <button type="submit" class="btn w-100 text-white" style="background-color: #007bff;">Đăng nhập</button>
+
+        <!-- Link đăng ký -->
+        <div class="text-center mt-3">
+          <small>Bạn chưa có tài khoản? 
+            <a href="/streetsoul_store1/view/client/register.php" class="text-primary">Đăng ký ngay</a>
+          </small>
+        </div>
+      </div>
+    </form>
   </div>
-  <div class="mb-3">
-    <label for="matkhau" class="form-label">Mật khẩu</label>
-    <input type="password" class="form-control" id="matkhau" name="matkhau" required>
-  </div>
-  <button type="submit" class="btn btn-primary">Đăng nhập</button>
-  <a href="/streetsoul_store1/index.php" class="btn btn-secondary ms-2">Về trang chủ</a>
+</div>
 
-  <!-- Thêm thông báo và nút đăng ký -->
-  <div class="mt-3 text-center">
-    <p>Bạn chưa có tài khoản? <a href="/streetsoul_store1/view/client/register.php">Đăng ký ngay</a></p>
-  </div>
-</form>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
