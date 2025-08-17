@@ -1,26 +1,50 @@
 <?php
 ob_start();
 session_start();
-
 include_once __DIR__ . "/../layout/header.php";
+include_once __DIR__ . "/../../config/db.php";
 
+// Nếu giỏ hàng trống → quay về cart
 if (!isset($_SESSION['cart']) || empty($_SESSION['cart'])) {
     header('Location: ../cart.php');
     exit();
 }
 
+$database = new Database();
+$conn = $database->conn;
+
 $total = 0;
-$shippingFee = 30000; // Phí ship cố định
+$shipping_fee = 30000;
 
-// Tính tổng tiền từ giỏ hàng
+// Tính tổng tiền
 foreach ($_SESSION['cart'] as $item) {
-    $price = isset($item['price']) ? $item['price'] : 0;
-    $quantity = isset($item['quantity']) ? $item['quantity'] : 1;
-    $total += $price * $quantity;
+    $total += $item['price'] * $item['quantity'];
 }
+$grandTotal = $total + $shipping_fee;
 
-$grandTotal = $total + $shippingFee;
+// Khi submit form
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name    = trim($_POST['name'] ?? '');
+    $phone   = trim($_POST['phone'] ?? '');
+    $address = trim($_POST['address'] ?? '');
+    $pttt    = $_POST['pttt'] ?? 'COD';
 
+    // Lưu đơn hàng vào DB
+    $stmt = $conn->prepare("INSERT INTO orders (name, phone, address, total_price, shipping_fee, payment_method, status, created_at) VALUES (?, ?, ?, ?, ?, ?, 'pending', NOW())");
+    $stmt->bind_param("sssdis", $name, $phone, $address, $grandTotal, $shipping_fee, $pttt);
+    $stmt->execute();
+    $order_id = $stmt->insert_id;
+    $stmt->close();
+
+    // Lưu chi tiết đơn hàng
+    foreach ($_SESSION['cart'] as $item) {
+        $stmtItem = $conn->prepare("INSERT INTO order_details (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)");
+        $stmtItem->bind_param("iiid", $order_id, $item['id'], $item['quantity'], $item['price']);
+        $stmtItem->execute();
+        $stmtItem->close();
+    }
+
+    // Nếu VNPay → redirect sang VNPay
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
      if ($_POST['pttt'] == 'VNPay') {
@@ -52,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $inputData['vnp_BankCode'] = $vnp_BankCode;
             }
 
-            ksort($inputData);
+       ksort($inputData);
             $query = "";
             $i = 0;
             $hashdata = "";
@@ -76,17 +100,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ob_end_flush();
             //exit();
         } else {
-            header("Location: index.php");
+            header("Location: order-success.php");
             exit;
         }
-
+    }
 }
+
 ?>
 
 <div class="order-container">
     <h2>Thông tin đơn hàng</h2>
 
-    <!-- Danh sách sản phẩm trong đơn hàng -->
+    <!-- Danh sách sản phẩm trong giỏ hàng -->
     <div class="order-products">
         <h3>Sản phẩm:</h3>
         <table class="cart-table">
@@ -101,16 +126,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </thead>
             <tbody>
                 <?php foreach ($_SESSION['cart'] as $item): 
-                    $image = isset($item['image']) ? $item['image'] : 'no-image.jpg';
-                    $name = isset($item['name']) ? $item['name'] : 'Sản phẩm không tên';
-                    $price = isset($item['price']) ? $item['price'] : 0;
-                    $quantity = isset($item['quantity']) ? $item['quantity'] : 1;
+                    $image = $item['image'] ?? 'no-image.jpg';
+                    $name = $item['name'] ?? 'Sản phẩm không tên';
+                    $price = $item['price'] ?? 0;
+                    $quantity = $item['quantity'] ?? 1;
                     $subtotal = $price * $quantity;
                 ?>
                 <tr>
-                    <td>
-                    <img src="../<?php echo htmlspecialchars($image); ?>" width="50" alt="<?php echo htmlspecialchars($name); ?>">
-                    </td>
+                    <td><img src="../<?php echo htmlspecialchars($image); ?>" width="50" alt="<?php echo htmlspecialchars($name); ?>"></td>
                     <td><?php echo $name; ?></td>
                     <td><?php echo $quantity; ?></td>
                     <td><?php echo number_format($price); ?> VNĐ</td>
@@ -121,8 +144,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </table>
     </div>
 
-    <!-- Form nhập thông tin đặt hàng -->
-    <form action="process_order.php" method="POST">
+    <!-- Form nhập thông tin khách hàng -->
+    <form action="" method="POST">
         <div>
             <label for="name">Họ và tên:</label>
             <input type="text" id="name" name="name" required>
@@ -135,25 +158,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="address">Địa chỉ:</label>
             <input type="text" id="address" name="address" required>
         </div>
-         <input type="hidden" name="total" value="<?= $total ?>">
-
 
         <div>
-            <p>Phí vận chuyển: <?php echo number_format($shippingFee); ?> VNĐ</p>
-            <p>Phương thức thanh toán: </p>
-             <input type="radio" id="html" name="pttt" value="COD"> <label for="html">Tiền mặt</label><br>
-<input type="radio" id="css" name="pttt" value="VNPay">
-<label for="css">VN PAY</label><br>
-
-<input type="hidden" name="total_price" value="<?php echo number_format($grandTotal); ?>">
+            <p>Phí vận chuyển: <?php echo number_format($shipping_fee); ?> VNĐ</p>
             <p><strong>Tổng tiền: <?php echo number_format($grandTotal); ?> VNĐ</strong></p>
+            <p>Phương thức thanh toán:</p>
+            <input type="radio" name="pttt" value="COD" checked> Tiền mặt <br>
+            <input type="radio" name="pttt" value="VNPay"> VNPay
         </div>
 
-        <button type="submit" class="btn btn-primary">
-    Đặt hàng
-</button>
-
+        <button type="submit" class="btn btn-primary">Đặt hàng</button>
     </form>
 </div>
 
-<?php include __DIR__ . "/../layout/footer.php"; ?> */
+<?php include __DIR__ . "/../layout/footer.php"; ?>
