@@ -12,9 +12,6 @@ $query = "SELECT * FROM orders ORDER BY created_at DESC";
 $result = $conn->query($query);
 ?>
 
-<!-- Gọi file CSS riêng cho giao diện đơn hàng -->
-<link rel="stylesheet" href="/streetsoul_store1/public/css/orderUser.css">
-
 <div class="order-history container">
     <h2>Trạng thái đơn hàng</h2>
 
@@ -22,7 +19,7 @@ $result = $conn->query($query);
         <?php while ($order = $result->fetch_assoc()): ?>
             <div class="order-box">
                 <p><strong>Mã đơn:</strong> #<?php echo $order['id']; ?></p>
-                <p><strong>Khách hàng:</strong> <?php echo htmlspecialchars($order['customer_name']); ?></p>
+                <p><strong>Khách hàng:</strong> <?php echo htmlspecialchars($order['name']); ?></p>
                 <p><strong>Địa chỉ:</strong> <?php echo htmlspecialchars($order['address']); ?></p>
                 <p><strong>Số điện thoại:</strong> <?php echo htmlspecialchars($order['phone']); ?></p>
                 <p><strong>Ngày đặt:</strong> <?php echo date("d/m/Y H:i", strtotime($order['created_at'])); ?></p>
@@ -45,13 +42,29 @@ $result = $conn->query($query);
                             $detailsResult = $conn->query($detailQuery);
 
                             while ($item = $detailsResult->fetch_assoc()):
-                                // Giải mã JSON để lấy ảnh đầu tiên từ cột gallery
-                                $gallery = json_decode($item['gallery'], true);
-                                $thumbnail = isset($gallery[0]) ? $gallery[0] : 'default-thumbnail.jpg'; // Nếu không có ảnh thì dùng ảnh mặc định
+                                $thumbnail = null;
+
+                                if (!empty($item['gallery']) && is_string($item['gallery'])) {
+                                    // Thử decode JSON
+                                    $gallery = json_decode($item['gallery'], true);
+                                    if (json_last_error() === JSON_ERROR_NONE && !empty($gallery)) {
+                                        $thumbnail = $gallery[0]; // lấy ảnh đầu tiên trong mảng
+                                    } else {
+                                        // Nếu không phải JSON thì coi như chỉ lưu tên file ảnh
+                                        $thumbnail = $item['gallery'];
+                                    }
+                                }
                         ?>
                             <tr>
-                                <td><img src="/streetsoul_store1/public/images/<?php echo $thumbnail; ?>" alt="Ảnh sản phẩm" /></td>
-                                <td><?php echo htmlspecialchars($item['product_name']); ?></td>
+                                <td>
+                                    <?php if ($thumbnail): ?>
+                                        <img src="/streetsoul_store1/public/images/<?php echo htmlspecialchars($thumbnail); ?>" 
+                                             alt="Ảnh sản phẩm" width="100">
+                                    <?php else: ?>
+                                        <span>Không có ảnh</span>
+                                    <?php endif; ?>
+                                </td>
+                                <!-- <td><?php echo htmlspecialchars($item['product']); ?></td> -->
                                 <td><?php echo $item['quantity']; ?></td>
                                 <td><?php echo number_format($item['price']); ?> VNĐ</td>
                             </tr>
