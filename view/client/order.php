@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $pttt    = $_POST['pttt'] ?? 'COD';
 
     // Lưu đơn hàng vào DB
-    $stmt = $conn->prepare("INSERT INTO orders (name, phone, address, total_price, shipping_fee, payment_method, status, created_at) VALUES (?, ?, ?, ?, ?, ?, 'pending', NOW())");
+    $stmt = $conn->prepare("INSERT INTO orders (name, phone, address, total_price, shipping_fee, payment_method, status, created_at) VALUES (?, ?, ?, ?, ?, ?, 'Đang xử lý', NOW())");
     $stmt->bind_param("sssdis", $name, $phone, $address, $grandTotal, $shipping_fee, $pttt);
     $stmt->execute();
     $order_id = $stmt->insert_id;
