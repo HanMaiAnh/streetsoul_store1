@@ -110,5 +110,76 @@ class Product {
 
         return $products;
     }
+
+    /**
+     * Đếm tất cả sản phẩm
+     * @return int
+     */
+    public function countAllProducts() {
+        $query = "SELECT COUNT(*) as total FROM products";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $data = $result->fetch_assoc();
+return $data['total'] ?? 0;
+    }
+
+    /**
+     * Đếm sản phẩm theo danh mục
+     * @param int $categoryId
+     * @return int
+     */
+    public function countProductsByCategory($categoryId) {
+        $query = "SELECT COUNT(*) as total FROM products WHERE category_id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $categoryId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $data = $result->fetch_assoc();
+        return $data['total'] ?? 0;
+    }
+
+    /**
+     * Lấy tất cả sản phẩm (có phân trang)
+     * @param int $limit
+     * @param int $offset
+     * @return array
+     */
+    public function getAllProductsPaginated($limit, $offset) {
+        $query = "SELECT * FROM products LIMIT ? OFFSET ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("ii", $limit, $offset);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $products = [];
+        while ($row = $result->fetch_assoc()) {
+            $products[] = $row;
+        }
+
+        return $products;
+    }
+
+    /**
+     * Lấy sản phẩm theo danh mục (có phân trang)
+     * @param int $categoryId
+     * @param int $limit
+     * @param int $offset
+     * @return array
+     */
+    public function getProductsByCategoryPaginated($categoryId, $limit, $offset) {
+        $query = "SELECT * FROM products WHERE category_id = ? LIMIT ? OFFSET ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("iii", $categoryId, $limit, $offset);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $products = [];
+        while ($row = $result->fetch_assoc()) {
+            $products[] = $row;
+        }
+
+        return $products;
+    }
 }
 ?>
