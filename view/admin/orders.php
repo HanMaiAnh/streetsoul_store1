@@ -1,70 +1,48 @@
 <?php
-// Kiểm tra quyền truy cập
+// Giữ session trên toàn website
+ini_set('session.cookie_path', '/');
 session_start();
-if (!isset($_SESSION['user']) || $_SESSION['user']['vaitro'] !== 1) {
+
+// Chỉ admin mới được truy cập
+if (!isset($_SESSION['user']) || $_SESSION['user']['vaitro'] != 1) {
+    $_SESSION['redirect_after_login'] = $_SERVER['REQUEST_URI']; // lưu lại URL để quay lại sau khi login
     header("Location: /streetsoul_store1/view/client/login.php");
     exit;
 }
 
 try {
-    // Kết nối CSDL
     $conn = new PDO("mysql:host=localhost;dbname=streetsoul_store999;charset=utf8", "root", "");
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Truy vấn tất cả đơn hàng
-    $sql = "SELECT * FROM orders ORDER BY order_date DESC";
+    $sql = "SELECT * FROM orders ORDER BY created_at DESC";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
-
-    // Đảm bảo có dữ liệu, nếu không gán mảng rỗng
     $orders = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 } catch (PDOException $e) {
     echo "<p style='color: red;'>Lỗi kết nối: " . htmlspecialchars($e->getMessage()) . "</p>";
     $orders = [];
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <title>Quản lý đơn hàng</title>
-    <link rel="stylesheet" href="/streetsoul_store1/public/admin.css">
+    <link rel="stylesheet" href="/streetsoul_store1/view/admin/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        body { display: flex; background: #f8f9fa; }
-
+        body { display: flex; background: #f8f9fa; font-family: Arial, sans-serif; margin: 0; }
         .sidebar { width: 250px; height: 100vh; background: #343a40; color: white; padding: 20px; position: fixed; }
         .sidebar a { display: block; color: white; padding: 10px; text-decoration: none; margin: 10px 0; transition: 0.3s; }
         .sidebar a:hover { background: #495057; }
-
         .content { margin-left: 270px; padding: 20px; width: 100%; }
-        .dashboard-card {
-            background: white; padding: 20px; border-radius: 10px;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1); margin-bottom: 20px;
-        }
-
-        .dashboard-card h2 { color:rgb(0, 0, 0); margin-bottom: 10px; }
-        .dashboard-card p { color: #555; }
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1); }
+        .dashboard-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 2px 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 2px 2px 10px rgba(0,0,0,0.1); }
         th, td { padding: 12px; text-align: left; }
-        th { background:rgb(255, 255, 255); color: black; }
-        tr:nth-child(even) { background: #f1f1f1; }
-        .btn {
-    display: inline-block;
-    padding: 8px 12px;
-    text-decoration: none;
-    background:rgb(255, 255, 255); /* Màu xanh đậm hơn */
-    color: black;
-    border-radius: 5px;
-    border: 2px solid black; /* Viền đen */
-    }
-
-    .btn:hover {
-        background: #1e7e34; /* Giữ nguyên màu khi hover */
-    }
+        th { background: #f1f1f1; }
+        tr:nth-child(even) { background: #f9f9f9; }
+        .btn { display: inline-block; padding: 6px 10px; background: white; color: black; border-radius: 5px; border: 1px solid black; text-decoration: none; }
+        .btn:hover { background: #1e7e34; color: white; }
     </style>
 </head>
 <body>
@@ -80,7 +58,7 @@ try {
     <div class="content">
         <div class="dashboard-card">
             <h2>Quản lý đơn hàng</h2>
-            <p>Bạn có thể theo dõi và xác nhận các đơn hàng của khách hàng tại đây.</p>
+            <p>Theo dõi và xác nhận đơn hàng tại đây.</p>
         </div>
 
         <?php if (!empty($orders)): ?>
@@ -95,14 +73,12 @@ try {
                 <?php foreach ($orders as $order): ?>
                 <tr>
                     <td><?= htmlspecialchars($order['id']) ?></td>
-                    <td><?= htmlspecialchars($order['order_date']) ?></td>
-                    <td><?= htmlspecialchars($order['customer_name']) ?></td>
+                    <td><?= htmlspecialchars($order['created_at']) ?></td>
+                    <td><?= htmlspecialchars($order['name']) ?></td>
                     <td><?= htmlspecialchars($order['status']) ?></td>
                     <td>
-                        <?php if ($order['status'] == 'Đang xử lý'): ?>
-                            <a class="btn" href="confirm_order.php?id=<?= $order['id'] ?>">Xác nhận</a>
-                        <?php elseif ($order['status'] == 'Đã xác nhận'): ?>
-                            <a class="btn" href="delivery_order.php?id=<?= $order['id'] ?>">Giao hàng</a>
+                        <?php if ($order['status'] !== 'Đã giao hàng'): ?>
+                            <a class="btn" href="/streetsoul_store1/view/admin/update_order_status.php?id=<?= urlencode($order['id']) ?>">Xác nhận</a>
                         <?php else: ?>
                             <span>Đã giao</span>
                         <?php endif; ?>
@@ -112,7 +88,7 @@ try {
             </table>
         <?php else: ?>
             <div class="dashboard-card">
-                <p style="text-align:center; color:#777;">Không có đơn hàng nào cần xử lý.</p>
+                <p style="text-align:center; color:#777;">Không có đơn hàng nào.</p>
             </div>
         <?php endif; ?>
     </div>
