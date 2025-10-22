@@ -155,8 +155,8 @@ if (isset($_SESSION['cart'])) {
                     <div class="user-menu">
                         <i class="fa fa-user" data-bs-toggle="dropdown"></i>
                         <div class="user-dropdown">
-                            <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal">Đăng nhập</a>
-                            <a href="#" data-bs-toggle="modal" data-bs-target="#registerModal">Đăng ký</a>
+                            <a href="/streetsoul_store1/view/client/login.php">Đăng nhập</a>
+                            <a href="/streetsoul_store1/view/client/register.php">Đăng ký</a>
                         </div>
                     </div>
                 <?php endif; ?>
@@ -168,7 +168,7 @@ if (isset($_SESSION['cart'])) {
 <!-- Modal Đăng nhập -->
 <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
   <div class="modal-dialog">
-    <form action="/streetsoul_store1/view/client/login.php" method="POST" class="modal-content">
+<form action="/streetsoul_store1/view/client/login.php" method="POST" class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Đăng nhập</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
