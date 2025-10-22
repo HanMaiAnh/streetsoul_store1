@@ -1,78 +1,99 @@
 <?php
-// Bật báo lỗi để dễ dàng phát hiện các vấn đề trong mã
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+require_once __DIR__ . '/../../config/db.php';
+session_start();
 
-// Kiểm tra nếu form được submit
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    // Lấy dữ liệu từ form
-    $tendangnhap = $_POST['tendangnhap'] ?? '';
-    $matkhau = $_POST['matkhau'] ?? '';
-    $hoten = $_POST['hoten'] ?? '';
-    $email = $_POST['email'] ?? '';
-    $ngaysinh = $_POST['ngaysinh'] ?? '';
-    $phai = $_POST['phai'] ?? '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $hoten = trim($_POST['hoten']);
+    $username = trim($_POST['tendangnhap']);
+    $password = password_hash($_POST['matkhau'], PASSWORD_DEFAULT);
+    $email = trim($_POST['email']);
+    $ngaysinh = $_POST['ngaysinh'] ?? null;
+    $phai = $_POST['phai'] ?? 1;
 
-    try {
-        // Kết nối đến cơ sở dữ liệu
-        $conn = new PDO("mysql:host=localhost;dbname=streetsoul_store999;charset=utf8", "root", "");
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $database = new Database();
+    $conn = $database->getConnection();
 
-        // SQL để thêm dữ liệu vào bảng users
-        $sql = "INSERT INTO users (tendangnhap, matkhau, hoten, email, ngaysinh, phai)
-                VALUES (?, ?, ?, ?, ?, ?)";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([$tendangnhap, $matkhau, $hoten, $email, $ngaysinh, $phai]);
+    // Kiểm tra trùng username
+    $check = $conn->prepare("SELECT * FROM users WHERE tendangnhap = ?");
+    $check->bind_param("s", $username);
+    $check->execute();
+    $result = $check->get_result();
 
-        // Quay về trang chủ sau khi đăng ký thành công
-        header("Location:/streetsoul_store1/index.php");
-        exit;
-    } catch (PDOException $e) {
-        echo "Lỗi: " . $e->getMessage();
+    if ($result->num_rows > 0) {
+        $error = "Tên đăng nhập đã tồn tại!";
+    } else {
+        $stmt = $conn->prepare("INSERT INTO users (hoten, tendangnhap, matkhau, email, ngaysinh, phai, vaitro) VALUES (?, ?, ?, ?, ?, ?, 0)");
+        $stmt->bind_param("ssssss", $hoten, $username, $password, $email, $ngaysinh, $phai);
+        if ($stmt->execute()) {
+            header("Location: /streetsoul_store1/view/client/login.php?success=1");
+            exit();
+        } else {
+            $error = "Đăng ký thất bại, vui lòng thử lại!";
+        }
     }
 }
 ?>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng ký - StreetSoul Store</title>
+    <link rel="stylesheet" href="/streetsoul_store1/public/auth.css">
+</head>
+<body>
+  <section>
+  <!-- Hiệu ứng lá rơi -->
+  <div class="leaves">
+    <div class="set">
+      <div><img src="/streetsoul_store1/public/images/leaf_01.png" alt=""></div>
+      <div><img src="/streetsoul_store1/public/images/leaf_02.png" alt=""></div>
+      <div><img src="/streetsoul_store1/public/images/leaf_03.png" alt=""></div>
+      <div><img src="/streetsoul_store1/public/images/leaf_04.png" alt=""></div>
+      <div><img src="/streetsoul_store1/public/images/leaf_01.png" alt=""></div>
+      <div><img src="/streetsoul_store1/public/images/leaf_02.png" alt=""></div>
+      <div><img src="/streetsoul_store1/public/images/leaf_03.png" alt=""></div>
+      <div><img src="/streetsoul_store1/public/images/leaf_04.png" alt=""></div>
+    </div>
+  </div>
 
-<!-- Phần HTML của trang đăng ký -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css">
+  <!-- Hình nền và nhân vật -->
+  <img src="/streetsoul_store1/public/images/bg.jpg" class="bg" alt="bg">
+  <img src="/streetsoul_store1/public/images/girl.png" class="girl" alt="girl">
+  <img src="/streetsoul_store1/public/images/trees.png" class="trees" alt="trees">
 
-<form style="width: 50%; margin: auto; margin-top: 50px;" class="border border-primary border-2 rounded p-2" method="POST">
-  <div class="mb-3">
-    <label for="tendangnhap" class="form-label">Tên đăng nhập</label>
-    <input type="text" class="form-control" id="tendangnhap" name="tendangnhap" placeholder="Nhập tên đăng nhập từ 6-20 ký tự">
-    <div id="LoiTenDangNhap" class="form-text">Lỗi tên đăng nhập</div>
-  </div>
-  <div class="mb-3">
-    <label for="matkhau" class="form-label">Mật khẩu</label>
-    <input type="password" class="form-control" id="matkhau" name="matkhau" placeholder="Nhập mật khẩu từ 6-20 ký tự">
-  </div>
-  <div class="mb-3">
-    <label for="hoten" class="form-label">Họ tên</label>
-    <input type="text" class="form-control" id="hoten" name="hoten" placeholder="Nhập họ tên của bạn">
-    <div id="LoiHoTen" class="form-text">Lỗi họ tên</div>
-  </div>
-  <div class="mb-3">
-    <label for="email" class="form-label">Email</label>
-    <input type="email" class="form-control" id="email" name="email" placeholder="Nhập email của bạn">
-    <div id="LoiEmail" class="form-text">Lỗi email</div>
-  </div>
-  <div class="mb-3">
-    <label for="ngaysinh" class="form-label">Ngày sinh</label>
-    <input type="date" class="form-control" id="ngaysinh" name="ngaysinh" placeholder="Nhập ngày sinh của bạn">
-    <div id="LoiNgaySinh" class="form-text">Lỗi khi nhập ngày sinh</div>
-  </div>
-  <label class="form-label">Giới tính</label>
-  <div class="form-check">
-    <input class="form-check-input" type="radio" name="phai" id="nam" value="1">
-    <label class="form-check-label" for="nam">
-      Nam
-    </label>
-  </div>
-  <div class="form-check">
-    <input class="form-check-input" type="radio" name="phai" id="nu" value="0" checked>
-    <label class="form-check-label" for="nu">
-      Nữ
-    </label>
-  </div>
-  <button type="submit" class="btn btn-primary">Đăng ký</button>
-</form>
+    <!-- Form đăng ký -->
+    <div class="login">
+      <h2>Đăng ký tài khoản</h2>
+      <form method="POST" action="register_process.php">
+        <div class="inputBox">
+          <input type="text" name="fullname" placeholder="Họ và tên" required>
+        </div>
+
+        <div class="inputBox">
+          <input type="text" name="username" placeholder="Tên đăng nhập" required>
+        </div>
+
+        <div class="inputBox">
+          <input type="email" name="email" placeholder="Địa chỉ Email" required>
+        </div>
+
+        <div class="inputBox">
+          <input type="password" name="password" placeholder="Mật khẩu" required>
+        </div>
+
+        <div class="inputBox">
+          <input type="password" name="confirm_password" placeholder="Nhập lại mật khẩu" required>
+        </div>
+
+        <div class="inputBox">
+          <input type="submit" id="btn" value="Tạo tài khoản">
+        </div>
+
+        <div class="group">
+          <a href="login.php">Đã có tài khoản? Đăng nhập</a>
+        </div>
+      </form>
+    </div>
+    </div>
+</body>
+</html>
