@@ -26,69 +26,64 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 ?>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Đăng nhập - StreetSoul Store</title>
+  <link rel="stylesheet" href="/streetsoul_store1/public/auth.css">
+</head>
+<body>
 
-<!-- Modal Đăng nhập -->
-<div class="modal fade show" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true" style="display:block;">
-  <div class="modal-dialog">
-    <form action="" method="POST" class="modal-content p-4">
-      
-      <!-- Tiêu đề -->
-      <div class="modal-header border-0 pb-0">
-        <h5 class="modal-title fw-bold" id="loginModalLabel">Đăng nhập</h5>
-        <a href="/streetsoul_store1/index.php" class="btn-close"></a>
+<section>
+  <!-- Hiệu ứng lá rơi -->
+  <div class="leaves">
+    <div class="set">
+      <div><img src="/streetsoul_store1/public/images/leaf_01.png" alt=""></div>
+      <div><img src="/streetsoul_store1/public/images/leaf_02.png" alt=""></div>
+      <div><img src="/streetsoul_store1/public/images/leaf_03.png" alt=""></div>
+      <div><img src="/streetsoul_store1/public/images/leaf_04.png" alt=""></div>
+      <div><img src="/streetsoul_store1/public/images/leaf_01.png" alt=""></div>
+      <div><img src="/streetsoul_store1/public/images/leaf_02.png" alt=""></div>
+      <div><img src="/streetsoul_store1/public/images/leaf_03.png" alt=""></div>
+      <div><img src="/streetsoul_store1/public/images/leaf_04.png" alt=""></div>
+    </div>
+  </div>
+
+  <!-- Hình nền và nhân vật -->
+  <img src="/streetsoul_store1/public/images/bg.jpg" class="bg" alt="bg">
+  <img src="/streetsoul_store1/public/images/girl.png" class="girl" alt="girl">
+  <img src="/streetsoul_store1/public/images/trees.png" class="trees" alt="trees">
+
+  <!-- Form đăng nhập -->
+  <div class="login">
+    <h2>Đăng nhập</h2>
+
+    <?php if (!empty($error)): ?>
+      <div class="error-box"><?= htmlspecialchars($error) ?></div>
+    <?php endif; ?>
+
+    <form method="POST">
+      <div class="inputBox">
+        <input type="text" name="tendangnhap" placeholder="Tên đăng nhập" required>
       </div>
 
-      <div class="modal-body">
+      <div class="inputBox">
+        <input type="password" name="matkhau" placeholder="Mật khẩu" required>
+      </div>
 
-        <!-- Nút đăng nhập Facebook -->
-        <a href="#" class="btn w-100 mb-2 text-white" style="background-color: #3b5998;">
-          <i class="bi bi-facebook me-2"></i> Đăng nhập bằng Facebook
-        </a>
+      <div class="inputBox">
+        <input type="submit" value="Đăng nhập" id="btn">
+      </div>
 
-        <!-- Nút đăng nhập Google -->
-        <a href="#" class="btn w-100 mb-4 text-white" style="background-color: #db4437;">
-          <i class="bi bi-google me-2"></i> Đăng nhập bằng Google
-        </a>
-
-        <!-- Hiển thị lỗi -->
-        <?php if (!empty($error)): ?>
-            <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
-        <?php endif; ?>
-
-        <!-- Tài khoản -->
-        <div class="mb-3">
-          <label for="username" class="form-label">Tài khoản</label>
-          <input type="text" id="username" class="form-control" name="tendangnhap" required>
-        </div>
-
-        <!-- Mật khẩu -->
-        <div class="mb-3">
-          <label for="password" class="form-label">Mật khẩu</label>
-          <input type="password" id="password" class="form-control" name="matkhau" required>
-        </div>
-
-        <!-- Ghi nhớ -->
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="rememberMe">
-<label for="rememberMe" class="form-check-label">Ghi nhớ tài khoản</label>
-          </div>
-        </div>
-
-        <!-- Nút đăng nhập -->
-        <button type="submit" class="btn w-100 text-white" style="background-color: #007bff;">Đăng nhập</button>
-
-        <!-- Link đăng ký -->
-        <div class="text-center mt-3">
-          <small>Bạn chưa có tài khoản? 
-            <a href="/streetsoul_store1/view/client/register.php" class="text-primary">Đăng ký ngay</a>
-          </small>
-        </div>
+      <div class="group">
+        <a href="/streetsoul_store1/view/client/forgot_password.php">Quên mật khẩu?</a>
+        <a href="/streetsoul_store1/view/client/register.php">Đăng ký</a>
       </div>
     </form>
   </div>
-</div>
+</section>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
