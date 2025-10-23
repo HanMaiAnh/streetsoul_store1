@@ -10,7 +10,7 @@ $database = new Database();
 $conn = $database->conn;
 
 // Truy vấn tất cả sản phẩm
-$sql = "SELECT * FROM products"; // Giả sử bảng sản phẩm có tên là "products"
+$sql = "SELECT * FROM products"; // bảng sản phẩm có tên là "products"
 $result = $conn->query($sql);
 
 // Kiểm tra và gán kết quả vào biến $allProducts
@@ -34,7 +34,6 @@ foreach ($allProducts as $product) {
 }
 ?>
 
-<!-- Banner -->
 <!-- Banner -->
 <style>
   .banner {
@@ -104,7 +103,7 @@ foreach ($allProducts as $product) {
 
 <div class="banner" id="banner">
   <div class="slides" id="slides">
-    <img src="public/images/banner1.png" alt="Banner 1">
+    <img src="public/images/banner1.png" alt="Banner 1">  
     <img src="public/images/banner2.png" alt="Banner 2">
     <img src="public/images/banner3.png" alt="Banner 3">
     <img src="public/images/banner4.png" alt="Banner 4">
@@ -166,18 +165,58 @@ timer = setInterval(nextSlide, AUTOPLAY_DELAY);
 
   update();
   startTimer();
-</script>
+</script> 
 
 <!-- Sản phẩm nổi bật -->
 <div class="container">
-    <h2>Sản phẩm nổi bật</h2>
+<style>
+  .section-banner {
+    width: 100%;
+    text-align: center;
+    margin: 30px 0;
+  }
+
+  .section-banner img {
+    width: 100%;
+    max-width: 1200px; /* Giới hạn kích thước tối đa */
+    height: auto;
+    border-radius: 12px;
+    object-fit: cover;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+  }
+
+  .section-banner img:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  }
+
+  @media (max-width: 768px) {
+    .section-banner img {
+      max-width: 95%;
+    }
+  }
+</style>
+
+
+<div class="section-banner">
+  <img src="/streetsoul_store1/public/images/banner-noi-bat.jpg" alt="Banner nổi bật">
+</div>
+
     <div class="product-list">
         <?php foreach (array_slice($featuredProducts, 0, 8) as $product): ?>
             <div class="product">
+            <div class="product-icons">
+              <button class="icon-btn"><i class="fas fa-heart"></i></button>
+              <button class="icon-btn"><i class="fas fa-shopping-cart"></i></button>
+              </div>
+              
                 <a href="/streetsoul_store1/view/client/productDetail.php?id=<?php echo $product['id']; ?>">
                     <img src="/streetsoul_store1/public/images/<?php echo htmlspecialchars($product['image']); ?>" 
                          alt="<?php echo htmlspecialchars($product['name']); ?>">
+                         
                     <h3><?php echo htmlspecialchars($product['name']); ?></h3>
+                    
                     <p class="price">
                         <?php echo number_format($product['price']); ?> VNĐ
                     </p>
@@ -190,7 +229,7 @@ timer = setInterval(nextSlide, AUTOPLAY_DELAY);
                         <input type="hidden" name="image" value="<?php echo htmlspecialchars($product['image']); ?>">
                         <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
                         <input type="hidden" name="quantity" value="1">
-                        <button type="submit" class="buy-now">Mua ngay</button> 
+                        <button type="submit" class="buy-now">Mua ngay</button>
                     </form>
                 </div> 
             </div>
