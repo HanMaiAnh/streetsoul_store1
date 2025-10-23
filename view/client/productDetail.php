@@ -73,16 +73,86 @@ $otherProducts = $productModel->getRandomProducts(4, $product['id']);
                 <?php echo number_format($originalPrice); ?> VNĐ
             </p>
         <?php endif; ?>
+<div class="promo-box" 
+     style="border:1px solid #e5e5e5;border-radius:8px;padding:10px 16px;background-color:#fffafa;
+            margin:18px 0;box-shadow:0 1px 4px rgba(0,0,0,0.04);font-family:sans-serif;">
+  <h4 style="font-size:15px;font-weight:600;color:#e63946;margin-bottom:8px;display:flex;
+             align-items:center;gap:5px;">🎁 Khuyến mãi</h4>
 
-        <div class="shipping-table">
-            <h3>Khu vực giao hàng</h3>
-            <table>
-                <tr><td>Hà Nội</td><td><span class="out-of-stock">Hết hàng</span></td></tr>
-                <tr><td>TP. Hồ Chí Minh</td><td><span class="in-stock">Còn hàng</span></td></tr>
-                <tr><td>Đà Nẵng</td><td><span class="out-of-stock">Hết hàng</span></td></tr>
-                <tr><td>Cần Thơ</td><td><span class="out-of-stock">Hết hàng</span></td></tr>
-            </table>
-        </div>
+  <div style="font-size:13px;color:#333;margin-bottom:4px;line-height:1.4;">🔸 Mã <b>YMS20</b>: Giảm 20K (đơn từ 299K)</div>
+  <div style="font-size:13px;color:#333;margin-bottom:4px;line-height:1.4;">🔸 Mã <b>YMS40</b>: Giảm 40K (đơn từ 599K)</div>
+  <div style="font-size:13px;color:#333;margin-bottom:4px;line-height:1.4;">🔸 Mã <b>YMS70</b>: Giảm 70K (đơn từ 899K)</div>
+  <div style="font-size:13px;color:#333;margin-bottom:4px;line-height:1.4;">🔸 Mã <b>YMS150</b>: Giảm 100K (đơn từ 1199K)</div>
+  <div style="font-size:13px;color:#333;margin-bottom:4px;line-height:1.4;">🚚 Freeship đơn từ 399K</div>
+
+  <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+    <button style="background-color:#e63946;color:#fff;border:none;border-radius:5px;padding:4px 10px;
+                   font-size:12px;font-weight:600;cursor:pointer;text-transform:uppercase;
+                   transition:all 0.25s;" 
+            onmouseover="this.style.backgroundColor='#c1121f'" 
+            onmouseout="this.style.backgroundColor='#e63946'">
+      YMS20
+    </button>
+
+    <button style="background-color:#e63946;color:#fff;border:none;border-radius:5px;padding:4px 10px;
+                   font-size:12px;font-weight:600;cursor:pointer;text-transform:uppercase;
+                   transition:all 0.25s;" 
+            onmouseover="this.style.backgroundColor='#c1121f'" 
+            onmouseout="this.style.backgroundColor='#e63946'">
+      YMS40
+    </button>
+
+    <button style="background-color:#e63946;color:#fff;border:none;border-radius:5px;padding:4px 10px;
+                   font-size:12px;font-weight:600;cursor:pointer;text-transform:uppercase;
+                   transition:all 0.25s;" 
+            onmouseover="this.style.backgroundColor='#c1121f'" 
+            onmouseout="this.style.backgroundColor='#e63946'">
+      YMS70
+    </button>
+
+    <button style="background-color:#e63946;color:#fff;border:none;border-radius:5px;padding:4px 10px;
+                   font-size:12px;font-weight:600;cursor:pointer;text-transform:uppercase;
+                   transition:all 0.25s;" 
+            onmouseover="this.style.backgroundColor='#c1121f'" 
+            onmouseout="this.style.backgroundColor='#e63946'">
+      YMS150
+    </button>
+  </div>
+</div>
+
+
+
+<label style="font-weight:600;display:block;margin-top:15px;margin-bottom:6px;font-size:15px;">
+  Kích thước:
+</label>
+
+<div id="size-list" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;">
+  <button style="border:1px solid #000;background-color:#000;color:#fff;padding:8px 16px;border-radius:6px;
+                 font-size:14px;font-weight:500;cursor:pointer;min-width:44px;text-align:center;">S</button>
+  <button style="border:1px solid #ddd;background-color:#fff;color:#222;padding:8px 16px;border-radius:6px;
+                 font-size:14px;font-weight:500;cursor:pointer;min-width:44px;text-align:center;">M</button>
+  <button style="border:1px solid #ddd;background-color:#fff;color:#222;padding:8px 16px;border-radius:6px;
+                 font-size:14px;font-weight:500;cursor:pointer;min-width:44px;text-align:center;">L</button>
+  <button style="border:1px solid #ddd;background-color:#fff;color:#222;padding:8px 16px;border-radius:6px;
+                 font-size:14px;font-weight:500;cursor:pointer;min-width:44px;text-align:center;">XL</button>
+</div>
+
+<script>
+  // Chức năng chọn size
+  const sizeButtons = document.querySelectorAll('#size-list button');
+  sizeButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      sizeButtons.forEach(b => {
+        b.style.backgroundColor = '#fff';
+        b.style.color = '#222';
+        b.style.border = '1px solid #ddd';
+      });
+      this.style.backgroundColor = '#000';
+      this.style.color = '#fff';
+      this.style.border = '1px solid #000';
+    });
+  });
+</script>
 
         <div class="description">
             <h3>Mô tả sản phẩm</h3>
@@ -92,29 +162,132 @@ $otherProducts = $productModel->getRandomProducts(4, $product['id']);
             </p>
         </div>
 
-      <div class="voucher-section">
-    <input type="text" id="voucherCode" class="voucher-input" placeholder="Nhập mã giảm giá">
-    <button class="custom-btn" onclick="applyVoucher()">Áp dụng</button>
-</div>
 
-<div class="buttons"> 
-    <button class="custom-btn" id="addToCartBtn" 
-        data-id="<?= $product['id'] ?>" 
-        data-name="<?= htmlspecialchars($product['name']) ?>" 
-        data-price="<?= $discountedPrice ?>">
-         Thêm vào giỏ hàng 
-    </button>
+<div class="buttons" style="
+  display: flex; 
+  align-items: center; 
+  gap: 12px; 
+  margin-top: 25px;
+  flex-wrap: wrap;
+  font-family: 'Poppins', sans-serif;
+">
 
-         <form id="buyNowForm" action="/streetsoul_store1/controller/cart.controller.php" method="POST">
+  <!-- Bộ chọn số lượng -->
+  <div style="
+    display: flex; 
+    align-items: center; 
+    border: 1px solid #ccc; 
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+  ">
+    <button id="decreaseQty" style="
+      width: 40px; height: 40px; 
+      font-size: 20px; font-weight: 600; 
+      border: none; background: #f8f8f8; 
+      cursor: pointer; transition: all 0.25s; color: #333;
+    ">−</button>
+
+    <input id="quantity" type="text" value="1" readonly style="
+      width: 50px; height: 40px; 
+      text-align: center; 
+      border: none; 
+      background: white; 
+      font-size: 16px; 
+      font-weight: 500; color: #222;
+    ">
+
+    <button id="increaseQty" style="
+      width: 40px; height: 40px; 
+      font-size: 20px; font-weight: 600; 
+      border: none; background: #f8f8f8; 
+      cursor: pointer; transition: all 0.25s; color: #333;
+    ">+</button>
+  </div>
+
+  <!-- Nút thêm vào giỏ hàng -->
+  <button class="custom-btn" id="addToCartBtn" 
+      data-id="<?= $product['id'] ?>" 
+      data-name="<?= htmlspecialchars($product['name']) ?>" 
+      data-price="<?= $discountedPrice ?>" style="
+        background: linear-gradient( #ff8f00);
+        color: white; border: none; 
+        padding: 11px 26px; 
+        border-radius: 10px; 
+        cursor: pointer; 
+        font-weight: 600; 
+        letter-spacing: 0.3px;
+        transition: all 0.3s;
+        font-size: 15px;
+      " 
+      onmouseover="this.style.background='linear-gradient( #ff8f00)';"
+      onmouseout="this.style.background='linear-gradient( #ff6f00)';">
+      🛒 Thêm vào giỏ hàng
+  </button>
+
+  <!-- Form mua ngay -->
+  <form id="buyNowForm" action="/streetsoul_store1/controller/cart.controller.php" method="POST" style="margin: 0;">
     <input type="hidden" name="action" value="buyNow">
     <input type="hidden" name="id" value="<?= $product['id'] ?>">
     <input type="hidden" name="name" value="<?= htmlspecialchars($product['name']) ?>">
     <input type="hidden" name="price" value="<?= $discountedPrice ?>">
-    <input type="hidden" name="quantity" value="1">
-    <button type="submit" class="buy-now-btn">Mua ngay</button>
-</form>
+    <input type="hidden" name="quantity" id="buyNowQuantity" value="1">
+    <button type="submit" class="buy-now-btn" style="
+      background: linear-gradient(#ff8f00);
+      color: white; border: none; 
+      padding: 11px 26px; 
+      border-radius: 10px; 
+      cursor: pointer; 
+      font-weight: 600; 
+      letter-spacing: 0.3px;
+      transition: all 0.3s;
+      font-size: 15px;
+    " 
+    onmouseover="this.style.background='linear-gradient( #ff8f00)';"
+    onmouseout="this.style.background='linear-gradient( #ff8f00,)';">
+      ⚡ Mua ngay
+    </button>
+  </form>
 
-        </div>
+</div>
+
+
+<script>
+  const decreaseBtn = document.getElementById("decreaseQty");
+  const increaseBtn = document.getElementById("increaseQty");
+  const quantityInput = document.getElementById("quantity");
+  const buyNowQuantity = document.getElementById("buyNowQuantity");
+
+  decreaseBtn.addEventListener("click", () => {
+    let qty = parseInt(quantityInput.value);
+    if (qty > 1) {
+      quantityInput.value = qty - 1;
+      buyNowQuantity.value = qty - 1;
+    }
+  });
+
+  increaseBtn.addEventListener("click", () => {
+    let qty = parseInt(quantityInput.value);
+    quantityInput.value = qty + 1;
+    buyNowQuantity.value = qty + 1;
+  });
+
+  // Hiệu ứng hover cho 2 nút
+  const style = document.createElement("style");
+  style.innerHTML = `
+    .custom-btn:hover, .buy-now-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 14px rgba(0,132,176,0.4);
+      opacity: 0.95;
+    }
+    #increaseQty:hover, #decreaseQty:hover {
+      background: #eee;
+      transform: scale(1.05);
+    }
+  `;
+  document.head.appendChild(style);
+</script>
+
     </div>
 </div>
                 
@@ -187,5 +360,134 @@ $('#addToCartBtn').on('click', function () {
     }, 'json');
 });
 </script>
+
+<!-- ====================== PHẦN ĐÁNH GIÁ NGƯỜI DÙNG ====================== -->
+<div class="container product-reviews" style="
+  margin-top: 50px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  padding: 25px 30px;
+  font-family: 'Poppins', sans-serif;
+">
+
+  <h3 style="font-size: 22px; font-weight: 600; margin-bottom: 20px;">⭐ Đánh giá của người dùng</h3>
+
+  <!-- Danh sách đánh giá mẫu -->
+  <div id="reviewList" style="display: flex; flex-direction: column; gap: 16px;">
+
+    <div style="border-bottom: 1px solid #eee; padding-bottom: 10px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <strong>Nguyễn Văn A</strong>
+        <div style="color: #ffb400;">★★★★★</div>
+      </div>
+      <p style="margin-top: 5px; color: #444;">Áo đẹp, chất vải mềm, mặc rất thoải mái!</p>
+    </div>
+
+    <div style="border-bottom: 1px solid #eee; padding-bottom: 10px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <strong>Trần Minh B</strong>
+        <div style="color: #ffb400;">★★★★☆</div>
+      </div>
+      <p style="margin-top: 5px; color: #444;">Giao hàng nhanh, form áo đúng như mô tả.</p>
+    </div>
+
+  </div>
+
+  <!-- Form thêm đánh giá -->
+  <div style="margin-top: 25px;">
+    <h4 style="font-size: 18px; font-weight: 600; margin-bottom: 10px;">Viết đánh giá của bạn</h4>
+
+    <form id="reviewForm" style="display: flex; flex-direction: column; gap: 12px;">
+      <input type="text" id="reviewName" placeholder="Nhập tên của bạn" required style="
+        padding: 10px 14px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+        outline: none;
+      ">
+
+      <!-- Chọn số sao -->
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <span>Chọn số sao:</span>
+        <div id="starRating" style="display: flex; gap: 4px; cursor: pointer;">
+          <span data-star="1">⭐</span>
+          <span data-star="2">⭐</span>
+          <span data-star="3">⭐</span>
+          <span data-star="4">⭐</span>
+          <span data-star="5">⭐</span>
+        </div>
+      </div>
+
+      <textarea id="reviewText" placeholder="Viết cảm nhận của bạn..." required style="
+        padding: 10px 14px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+        height: 90px;
+        resize: vertical;
+        outline: none;
+      "></textarea>
+
+      <button type="submit" style="
+        align-self: flex-start;
+        background: linear-gradient(90deg, #ff8f00, #ff6f00);
+        color: #fff;
+        border: none;
+        padding: 10px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.25s;
+      " 
+      onmouseover="this.style.opacity='0.9'" 
+      onmouseout="this.style.opacity='1'">
+        Gửi đánh giá
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- ====================== SCRIPT XỬ LÝ ĐÁNH GIÁ ====================== -->
+<script>
+  let selectedStars = 0;
+
+  // Chọn sao
+  const stars = document.querySelectorAll('#starRating span');
+  stars.forEach(star => {
+    star.addEventListener('click', function() {
+      selectedStars = this.getAttribute('data-star');
+      stars.forEach(s => s.style.color = s.getAttribute('data-star') <= selectedStars ? '#ffb400' : '#ccc');
+    });
+  });
+
+  // Gửi đánh giá
+  document.getElementById('reviewForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const name = document.getElementById('reviewName').value.trim();
+    const text = document.getElementById('reviewText').value.trim();
+    if (!selectedStars) {
+      alert('Vui lòng chọn số sao!');
+      return;
+    }
+
+    const reviewHTML = `
+      <div style="border-bottom: 1px solid #eee; padding-bottom: 10px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <strong>${name}</strong>
+          <div style="color: #ffb400;">${'★'.repeat(selectedStars)}${'☆'.repeat(5 - selectedStars)}</div>
+        </div>
+        <p style="margin-top: 5px; color: #444;">${text}</p>
+      </div>
+    `;
+
+    document.getElementById('reviewList').innerHTML += reviewHTML;
+    this.reset();
+    stars.forEach(s => s.style.color = '#ccc');
+    selectedStars = 0;
+  });
+</script>
+
 
 <?php include __DIR__ . "/../layout/footer.php"; ?>
