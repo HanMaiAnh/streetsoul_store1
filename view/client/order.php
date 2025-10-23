@@ -183,14 +183,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 .checkout-left input {  padding: 10px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px; }
 .summary { font-size: 15px; line-height: 1.8; }
 .summary p strong { font-size: 16px; }
-.btn-submit { width: 100%; background: black; color: white; border: none; border-radius: 8px; padding: 14px 0; font-weight: 600; cursor: pointer; }
-.btn-submit:hover { background: #333; }
+.btn-submit { width: 100%; background: #fb923c; color: white; border: none; border-radius: 8px; padding: 14px 0; font-weight: 600; cursor: pointer; }
+.btn-submit:hover { background: #f97316; }
 .order-item { display: flex; align-items: center; margin-bottom: 15px; }
 .order-item img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; margin-right: 10px; }
 .order-item-info { flex: 1; }
 .coupon-box { margin-top: 15px; display: flex; gap: 8px; }
 .coupon-box input { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 8px; }
-.coupon-box button { background: #000; color: #fff; border: none; border-radius: 8px; padding: 8px 16px; }
+.coupon-box button { background: #fb923c; color: #fff; border: none; border-radius: 8px; padding: 8px 16px; }
 </style>
 
 <div class="checkout-container">

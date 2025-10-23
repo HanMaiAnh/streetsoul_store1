@@ -491,3 +491,4 @@ $('#addToCartBtn').on('click', function () {
 
 
 <?php include __DIR__ . "/../layout/footer.php"; ?>
+  
