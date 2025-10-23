@@ -1,8 +1,21 @@
 <?php
+// order.php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 ob_start();
 session_start();
+
 include_once __DIR__ . "/../layout/header.php";
 include_once __DIR__ . "/../../config/db.php";
+include_once __DIR__ . "/../../config/config.php";
+
+// Kiểm tra file config VNPay có tồn tại không
+$configPath = __DIR__ . "/../../config/config.php";
+if (file_exists($configPath)) {
+    include_once $configPath;
+}
 
 // Nếu giỏ hàng trống → quay về cart
 if (!isset($_SESSION['cart']) || empty($_SESSION['cart'])) {
@@ -10,76 +23,114 @@ if (!isset($_SESSION['cart']) || empty($_SESSION['cart'])) {
     exit();
 }
 
+// Kết nối DB
 $database = new Database();
 $conn = $database->conn;
-
-$total = 0;
-$shipping_fee = 30000;
-
-// Tính tổng tiền
-foreach ($_SESSION['cart'] as $item) {
-    $total += $item['price'] * $item['quantity'];
+if (!$conn) {
+    die("Lỗi kết nối DB: kết nối trả về null");
 }
+
+// Tính tổng tiền hàng
+$total = 0;
+foreach ($_SESSION['cart'] as $item) {
+    $price = isset($item['price']) ? (float) $item['price'] : 0;
+    $qty   = isset($item['quantity']) ? (int) $item['quantity'] : 1;
+    $total += $price * $qty;
+}
+$shipping_fee = 0;
 $grandTotal = $total + $shipping_fee;
 
-// Khi submit form
+// Xử lý khi submit
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name    = trim($_POST['name'] ?? '');
     $phone   = trim($_POST['phone'] ?? '');
     $address = trim($_POST['address'] ?? '');
     $pttt    = $_POST['pttt'] ?? 'COD';
 
-    // Lưu đơn hàng vào DB
-    $stmt = $conn->prepare("INSERT INTO orders (name, phone, address, total_price, shipping_fee, payment_method, status, created_at) VALUES (?, ?, ?, ?, ?, ?, 'Đang xử lý', NOW())");
-    $stmt->bind_param("sssdis", $name, $phone, $address, $grandTotal, $shipping_fee, $pttt);
-    $stmt->execute();
-    $order_id = $stmt->insert_id;
-    $stmt->close();
+    if ($name === '' || $phone === '' || $address === '') {
+        echo "<div style='color:red;padding:10px;border:1px solid #f00;margin:10px 0;'>Vui lòng nhập đầy đủ Họ tên, SĐT, Địa chỉ.</div>";
+    } else {
+        // Lưu đơn hàng vào DB
+        $sql = "INSERT INTO orders (name, phone, address, total_price, shipping_fee, payment_method, status, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, 'Đang xử lý', NOW())";
+        $stmt = $conn->prepare($sql);
+        if (!$stmt) {
+            die("Prepare lỗi (orders): " . $conn->error);
+        }
 
-    // Lưu chi tiết đơn hàng
-    foreach ($_SESSION['cart'] as $item) {
-        $stmtItem = $conn->prepare("INSERT INTO order_details (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)");
-        $stmtItem->bind_param("iiid", $order_id, $item['id'], $item['quantity'], $item['price']);
-        $stmtItem->execute();
+        if (!$stmt->bind_param("sssdds", $name, $phone, $address, $grandTotal, $shipping_fee, $pttt)) {
+            die("bind_param lỗi (orders): " . $stmt->error);
+        }
+
+        if (!$stmt->execute()) {
+            die("execute lỗi (orders): " . $stmt->error);
+        }
+
+        $order_id = $stmt->insert_id;
+        $stmt->close();
+
+        // Lưu chi tiết đơn hàng
+        $sqlItem = "INSERT INTO order_details (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)";
+        $stmtItem = $conn->prepare($sqlItem);
+        if (!$stmtItem) {
+            die("Prepare lỗi (order_details): " . $conn->error);
+        }
+
+        foreach ($_SESSION['cart'] as $item) {
+            $product_id = (int)($item['id'] ?? 0);
+            $quantity   = (int)($item['quantity'] ?? 1);
+            $price_item = (float)($item['price'] ?? 0);
+
+            if (!$stmtItem->bind_param("iiid", $order_id, $product_id, $quantity, $price_item)) {
+                die("bind_param lỗi (order_details): " . $stmtItem->error);
+            }
+            if (!$stmtItem->execute()) {
+                die("execute lỗi (order_details): " . $stmtItem->error);
+            }
+        }
         $stmtItem->close();
-    }
 
-    // Nếu VNPay → redirect sang VNPay
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        // Nếu chọn VNPay → redirect
+        if ($pttt === 'VNPay') {
+            include_once __DIR__ . "/../../config/config.php";
 
-     if ($_POST['pttt'] == 'VNPay') {
-        include_once __DIR__ . "/../../config.php";
+            if (empty($vnp_Url) || empty($vnp_TmnCode) || empty($vnp_HashSecret) || empty($vnp_Returnurl)) {
+                die("<div style='color:red;padding:10px;border:1px solid #f00;'>Thiếu cấu hình VNPay. Vui lòng kiểm tra file config/config.php.</div>");
+            }
 
-            $vnp_TxnRef = rand(1, 10000); //Mã giao dịch thanh toán tham chiếu của merchant
-            $vnp_Amount = 500 * 100; // Số tiền thanh toán
-            $vnp_Locale = 'vn'; //Ngôn ngữ chuyển hướng thanh toán
-            $vnp_BankCode = ''; //Mã phương thức thanh toán
-            $vnp_IpAddr = $_SERVER['REMOTE_ADDR']; //IP Khách hàng thanh toán
+            // Tạo dữ liệu thanh toán
+            $vnp_TxnRef = $order_id; // Mã giao dịch
+            $vnp_Amount = (int)($grandTotal * 100); // Đơn vị VNPay là đồng x 100
+            $vnp_Locale = 'vn';
+            $vnp_BankCode = '';
+            $vnp_IpAddr = $_SERVER['REMOTE_ADDR'];
+            $vnp_ExpireDate = date('YmdHis', strtotime('+15 minutes'));
 
-            $inputData = array(
+            $inputData = [
                 "vnp_Version" => "2.1.0",
                 "vnp_TmnCode" => $vnp_TmnCode,
-                "vnp_Amount" => $vnp_Amount * 100,
+                "vnp_Amount" => $vnp_Amount,
                 "vnp_Command" => "pay",
                 "vnp_CreateDate" => date('YmdHis'),
                 "vnp_CurrCode" => "VND",
                 "vnp_IpAddr" => $vnp_IpAddr,
                 "vnp_Locale" => $vnp_Locale,
-                "vnp_OrderInfo" => "Thanh toan GD: " . $vnp_TxnRef,
+                "vnp_OrderInfo" => "Thanh toán đơn hàng #" . $order_id,
                 "vnp_OrderType" => "other",
                 "vnp_ReturnUrl" => $vnp_Returnurl,
                 "vnp_TxnRef" => $vnp_TxnRef,
-                "vnp_ExpireDate" => $expire
-            );
+                "vnp_ExpireDate" => $vnp_ExpireDate
+            ];
 
-            if (isset($vnp_BankCode) && $vnp_BankCode != "") {
+            if (!empty($vnp_BankCode)) {
                 $inputData['vnp_BankCode'] = $vnp_BankCode;
             }
 
-       ksort($inputData);
+            // Sắp xếp & tạo chuỗi hash
+            ksort($inputData);
+            $hashdata = "";
             $query = "";
             $i = 0;
-            $hashdata = "";
             foreach ($inputData as $key => $value) {
                 if ($i == 1) {
                     $hashdata .= '&' . urlencode($key) . "=" . urlencode($value);
@@ -90,85 +141,97 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $query .= urlencode($key) . "=" . urlencode($value) . '&';
             }
 
-            $vnp_Url = $vnp_Url . "?" . $query;
+            $vnp_Url_full = $vnp_Url . "?" . $query;
             if (isset($vnp_HashSecret)) {
-                $vnpSecureHash = hash_hmac('sha512', $hashdata, $vnp_HashSecret);//  
-                $vnp_Url .= 'vnp_SecureHash=' . $vnpSecureHash;
+                $vnpSecureHash = hash_hmac('sha512', $hashdata, $vnp_HashSecret);
+                $vnp_Url_full .= 'vnp_SecureHash=' . $vnpSecureHash;
             }
-            //echo $vnp_Url;exit;
-            header('Location: ' . $vnp_Url);
+
+            // Chuyển hướng sang VNPay
+            header('Location: ' . $vnp_Url_full);
             ob_end_flush();
-            //exit();
+            exit();
         } else {
-            header("Location: order-success.php");
-            exit;
+            // COD
+            unset($_SESSION['cart']);
+            header("Location: order-success.php?order_id=" . urlencode($order_id));
+            exit();
         }
     }
 }
-
 ?>
 
-<div class="order-container">
-    <h2>Thông tin đơn hàng</h2>
+<!-- HTML -->
+<style>
+.checkout-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    padding: 40px;
+    background: #fafafa;
+    font-family: 'Inter', sans-serif;
+}
+.checkout-left, .checkout-right {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.checkout-left { flex: 2; }
+.checkout-right { flex: 1; }
+.checkout-left h3, .checkout-right h3 { margin-bottom: 20px; font-weight: 600; }
+.checkout-left input {  padding: 10px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px; }
+.summary { font-size: 15px; line-height: 1.8; }
+.summary p strong { font-size: 16px; }
+.btn-submit { width: 100%; background: black; color: white; border: none; border-radius: 8px; padding: 14px 0; font-weight: 600; cursor: pointer; }
+.btn-submit:hover { background: #333; }
+.order-item { display: flex; align-items: center; margin-bottom: 15px; }
+.order-item img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; margin-right: 10px; }
+.order-item-info { flex: 1; }
+.coupon-box { margin-top: 15px; display: flex; gap: 8px; }
+.coupon-box input { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 8px; }
+.coupon-box button { background: #000; color: #fff; border: none; border-radius: 8px; padding: 8px 16px; }
+</style>
 
-    <!-- Danh sách sản phẩm trong giỏ hàng -->
-    <div class="order-products">
-        <h3>Sản phẩm:</h3>
-        <table class="cart-table">
-            <thead>
-                <tr>
-                    <th>Hình ảnh</th>
-                    <th>Tên sản phẩm</th>
-                    <th>Số lượng</th>
-                    <th>Giá</th>
-                    <th>Thành tiền</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($_SESSION['cart'] as $item): 
-                    $image = $item['image'] ?? 'no-image.jpg';
-                    $name = $item['name'] ?? 'Sản phẩm không tên';
-                    $price = $item['price'] ?? 0;
-                    $quantity = $item['quantity'] ?? 1;
-                    $subtotal = $price * $quantity;
-                ?>
-                <tr>
-                    <td><img src="../<?php echo htmlspecialchars($image); ?>" width="50" alt="<?php echo htmlspecialchars($name); ?>"></td>
-                    <td><?php echo $name; ?></td>
-                    <td><?php echo $quantity; ?></td>
-                    <td><?php echo number_format($price); ?> VNĐ</td>
-                    <td><?php echo number_format($subtotal); ?> VNĐ</td>
-                </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+<div class="checkout-container">
+    <div class="checkout-left">
+        <h3>Thông tin giao hàng</h3>
+        <form method="POST">
+            <input type="text" name="name" placeholder="Nhập họ và tên" required>
+            <input type="text" name="phone" placeholder="Nhập số điện thoại" required>
+            <input type="text" name="address" placeholder="Địa chỉ, tên đường" required>
+
+            <p><strong>Phương thức thanh toán</strong></p>
+            <label><input type="radio" name="pttt" value="COD" checked> Thanh toán khi nhận hàng</label><br>
+            <label><input type="radio" name="pttt" value="VNPay"> Thanh toán VNPay</label><br><br>
+
+            <button type="submit" class="btn-submit">Đặt hàng</button>
+        </form>
     </div>
 
-    <!-- Form nhập thông tin khách hàng -->
-    <form action="" method="POST">
-        <div>
-            <label for="name">Họ và tên:</label>
-            <input type="text" id="name" name="name" required>
-        </div>
-        <div>
-            <label for="phone">Số điện thoại:</label>
-            <input type="text" id="phone" name="phone" required>
-        </div>
-        <div>
-            <label for="address">Địa chỉ:</label>
-            <input type="text" id="address" name="address" required>
-        </div>
+    <div class="checkout-right">
+        <h3>Giỏ hàng</h3>
+        <?php foreach ($_SESSION['cart'] as $item): ?>
+            <div class="order-item">
+                <img src="../<?php echo htmlspecialchars($item['image'] ?? 'no-image.jpg'); ?>" alt="">
+                <div class="order-item-info">
+                    <p><?php echo htmlspecialchars($item['name'] ?? 'Sản phẩm'); ?></p>
+                    <p><?php echo number_format($item['price'] ?? 0); ?>₫ × <?php echo intval($item['quantity'] ?? 1); ?></p>
+                </div>
+            </div>
+        <?php endforeach; ?>
 
-        <div>
-            <p>Phí vận chuyển: <?php echo number_format($shipping_fee); ?> VNĐ</p>
-            <p><strong>Tổng tiền: <?php echo number_format($grandTotal); ?> VNĐ</strong></p>
-            <p>Phương thức thanh toán:</p>
-            <input type="radio" name="pttt" value="COD" checked> Tiền mặt <br>
-            <input type="radio" name="pttt" value="VNPay"> VNPay
+        <hr>
+        <div class="summary">
+            <div class="coupon-box">
+            <input type="text" placeholder="Nhập mã khuyến mãi">
+            <button>Áp dụng</button>
+            </div>
+            <p>Tổng tiền hàng: <strong><?php echo number_format($total); ?>₫</strong></p>
+            <p>Phí vận chuyển: <strong><?php echo number_format($shipping_fee); ?>₫</strong></p>
+            <p><strong>Tổng thanh toán: <?php echo number_format($grandTotal); ?>₫</strong></p>
         </div>
-
-        <button type="submit" class="btn btn-primary">Đặt hàng</button>
-    </form>
+    </div>
 </div>
 
 <?php include __DIR__ . "/../layout/footer.php"; ?>
