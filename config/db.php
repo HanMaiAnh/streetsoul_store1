@@ -4,7 +4,7 @@ class Database {
     private $host = "localhost";
     private $user = "root";
     private $pass = "";
-    private $dbname = "streetsoul_store999";  
+    private $dbname = "streetsoul_store999";
     public $conn;
 
     public function __construct() {
