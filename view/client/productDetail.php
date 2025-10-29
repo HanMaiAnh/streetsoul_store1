@@ -361,7 +361,7 @@ $('#addToCartBtn').on('click', function () {
 });
 </script>
 
-<!-- ====================== PHẦN ĐÁNH GIÁ NGƯỜI DÙNG ====================== -->
+<!-- ====================== PHẦN ĐÁNH GIÁ NGƯỜI DÙNG (CHỈ XEM) ====================== -->
 <div class="container product-reviews" style="
   margin-top: 50px;
   background: #fff;
@@ -371,9 +371,9 @@ $('#addToCartBtn').on('click', function () {
   font-family: 'Poppins', sans-serif;
 ">
 
-  <h3 style="font-size: 22px; font-weight: 600; margin-bottom: 20px;">⭐ Đánh giá của người dùng</h3>
+  <h3 style="font-size: 22px; font-weight: 600; margin-bottom: 20px;">Đánh giá của người dùng</h3>
 
-  <!-- Danh sách đánh giá mẫu -->
+  <!-- Danh sách đánh giá hiển thị -->
   <div id="reviewList" style="display: flex; flex-direction: column; gap: 16px;">
 
     <div style="border-bottom: 1px solid #eee; padding-bottom: 10px;">
@@ -392,103 +392,22 @@ $('#addToCartBtn').on('click', function () {
       <p style="margin-top: 5px; color: #444;">Giao hàng nhanh, form áo đúng như mô tả.</p>
     </div>
 
-  </div>
-
-  <!-- Form thêm đánh giá -->
-  <div style="margin-top: 25px;">
-    <h4 style="font-size: 18px; font-weight: 600; margin-bottom: 10px;">Viết đánh giá của bạn</h4>
-
-    <form id="reviewForm" style="display: flex; flex-direction: column; gap: 12px;">
-      <input type="text" id="reviewName" placeholder="Nhập tên của bạn" required style="
-        padding: 10px 14px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        font-size: 14px;
-        outline: none;
-      ">
-
-      <!-- Chọn số sao -->
-      <div style="display: flex; align-items: center; gap: 6px;">
-        <span>Chọn số sao:</span>
-        <div id="starRating" style="display: flex; gap: 4px; cursor: pointer;">
-          <span data-star="1">⭐</span>
-          <span data-star="2">⭐</span>
-          <span data-star="3">⭐</span>
-          <span data-star="4">⭐</span>
-          <span data-star="5">⭐</span>
-        </div>
+    <div style="border-bottom: 1px solid #eee; padding-bottom: 10px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <strong>Lê Thảo C</strong>
+        <div style="color: #ffb400;">★★★★★</div>
       </div>
+      <p style="margin-top: 5px; color: #444;">Shop tư vấn nhiệt tình, áo đúng form và đẹp hơn mong đợi!</p>
+    </div>
 
-      <textarea id="reviewText" placeholder="Viết cảm nhận của bạn..." required style="
-        padding: 10px 14px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        font-size: 14px;
-        height: 90px;
-        resize: vertical;
-        outline: none;
-      "></textarea>
-
-      <button type="submit" style="
-        align-self: flex-start;
-        background: linear-gradient(90deg, #ff8f00, #ff6f00);
-        color: #fff;
-        border: none;
-        padding: 10px 24px;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.25s;
-      " 
-      onmouseover="this.style.opacity='0.9'" 
-      onmouseout="this.style.opacity='1'">
-        Gửi đánh giá
-      </button>
-    </form>
   </div>
+
+  <!-- Ghi chú -->
+  <p style="margin-top: 25px; color: #666; font-size: 14px; text-align: center;">
+    Tính năng gửi đánh giá sẽ sớm được cập nhật.
+  </p>
 </div>
 
-<!-- ====================== SCRIPT XỬ LÝ ĐÁNH GIÁ ====================== -->
-<script>
-  let selectedStars = 0;
-
-  // Chọn sao
-  const stars = document.querySelectorAll('#starRating span');
-  stars.forEach(star => {
-    star.addEventListener('click', function() {
-      selectedStars = this.getAttribute('data-star');
-      stars.forEach(s => s.style.color = s.getAttribute('data-star') <= selectedStars ? '#ffb400' : '#ccc');
-    });
-  });
-
-  // Gửi đánh giá
-  document.getElementById('reviewForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-
-    const name = document.getElementById('reviewName').value.trim();
-    const text = document.getElementById('reviewText').value.trim();
-    if (!selectedStars) {
-      alert('Vui lòng chọn số sao!');
-      return;
-    }
-
-    const reviewHTML = `
-      <div style="border-bottom: 1px solid #eee; padding-bottom: 10px;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <strong>${name}</strong>
-          <div style="color: #ffb400;">${'★'.repeat(selectedStars)}${'☆'.repeat(5 - selectedStars)}</div>
-        </div>
-        <p style="margin-top: 5px; color: #444;">${text}</p>
-      </div>
-    `;
-
-    document.getElementById('reviewList').innerHTML += reviewHTML;
-    this.reset();
-    stars.forEach(s => s.style.color = '#ccc');
-    selectedStars = 0;
-  });
-</script>
 
 
 <?php include __DIR__ . "/../layout/footer.php"; ?>
-  
