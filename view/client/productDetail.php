@@ -77,47 +77,48 @@ $otherProducts = $productModel->getRandomProducts(4, $product['id']);
      style="border:1px solid #e5e5e5;border-radius:8px;padding:10px 16px;background-color:#fffafa;
             margin:18px 0;box-shadow:0 1px 4px rgba(0,0,0,0.04);font-family:sans-serif;">
   <h4 style="font-size:15px;font-weight:600;color:#e63946;margin-bottom:8px;display:flex;
-             align-items:center;gap:5px;">🎁 Khuyến mãi</h4>
+             align-items:center;gap:5px;">Khuyến mãi</h4>
 
   <div style="font-size:13px;color:#333;margin-bottom:4px;line-height:1.4;">🔸 Mã <b>YMS20</b>: Giảm 20K (đơn từ 299K)</div>
   <div style="font-size:13px;color:#333;margin-bottom:4px;line-height:1.4;">🔸 Mã <b>YMS40</b>: Giảm 40K (đơn từ 599K)</div>
   <div style="font-size:13px;color:#333;margin-bottom:4px;line-height:1.4;">🔸 Mã <b>YMS70</b>: Giảm 70K (đơn từ 899K)</div>
   <div style="font-size:13px;color:#333;margin-bottom:4px;line-height:1.4;">🔸 Mã <b>YMS150</b>: Giảm 100K (đơn từ 1199K)</div>
-  <div style="font-size:13px;color:#333;margin-bottom:4px;line-height:1.4;">🚚 Freeship đơn từ 399K</div>
+  <div style="font-size:13px;color:#333;margin-bottom:4px;line-height:1.4;">Freeship đơn từ 399K</div>
 
   <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
-    <button style="background-color:#e63946;color:#fff;border:none;border-radius:5px;padding:4px 10px;
-                   font-size:12px;font-weight:600;cursor:pointer;text-transform:uppercase;
-                   transition:all 0.25s;" 
-            onmouseover="this.style.backgroundColor='#c1121f'" 
-            onmouseout="this.style.backgroundColor='#e63946'">
-      YMS20
-    </button>
+  <p style="background-color:#e63946;color:#fff;border:none;border-radius:5px;padding:4px 10px;
+             font-size:12px;font-weight:600;cursor:pointer;text-transform:uppercase;
+             transition:all 0.25s;display:inline-block;margin:0;"
+     onmouseover="this.style.backgroundColor='#c1121f'"
+     onmouseout="this.style.backgroundColor='#e63946'">
+    YMS20
+  </p>
 
-    <button style="background-color:#e63946;color:#fff;border:none;border-radius:5px;padding:4px 10px;
-                   font-size:12px;font-weight:600;cursor:pointer;text-transform:uppercase;
-                   transition:all 0.25s;" 
-            onmouseover="this.style.backgroundColor='#c1121f'" 
-            onmouseout="this.style.backgroundColor='#e63946'">
-      YMS40
-    </button>
+  <p style="background-color:#e63946;color:#fff;border:none;border-radius:5px;padding:4px 10px;
+             font-size:12px;font-weight:600;cursor:pointer;text-transform:uppercase;
+             transition:all 0.25s;display:inline-block;margin:0;"
+     onmouseover="this.style.backgroundColor='#c1121f'"
+     onmouseout="this.style.backgroundColor='#e63946'">
+    YMS40
+  </p>
 
-    <button style="background-color:#e63946;color:#fff;border:none;border-radius:5px;padding:4px 10px;
-                   font-size:12px;font-weight:600;cursor:pointer;text-transform:uppercase;
-                   transition:all 0.25s;" 
-            onmouseover="this.style.backgroundColor='#c1121f'" 
-            onmouseout="this.style.backgroundColor='#e63946'">
-      YMS70
-    </button>
+  <p style="background-color:#e63946;color:#fff;border:none;border-radius:5px;padding:4px 10px;
+             font-size:12px;font-weight:600;cursor:pointer;text-transform:uppercase;
+             transition:all 0.25s;display:inline-block;margin:0;"
+     onmouseover="this.style.backgroundColor='#c1121f'"
+     onmouseout="this.style.backgroundColor='#e63946'">
+    YMS70
+  </p>
 
-    <button style="background-color:#e63946;color:#fff;border:none;border-radius:5px;padding:4px 10px;
-                   font-size:12px;font-weight:600;cursor:pointer;text-transform:uppercase;
-                   transition:all 0.25s;" 
-            onmouseover="this.style.backgroundColor='#c1121f'" 
-            onmouseout="this.style.backgroundColor='#e63946'">
-      YMS150
-    </button>
-  </div>
+  <p style="background-color:#e63946;color:#fff;border:none;border-radius:5px;padding:4px 10px;
+             font-size:12px;font-weight:600;cursor:pointer;text-transform:uppercase;
+             transition:all 0.25s;display:inline-block;margin:0;"
+     onmouseover="this.style.backgroundColor='#c1121f'"
+     onmouseout="this.style.backgroundColor='#e63946'">
+    YMS150
+  </p>
+</div>
+
 </div>
 
 
@@ -323,23 +324,50 @@ $otherProducts = $productModel->getRandomProducts(4, $product['id']);
 
 </div>
 
-<script>
-function changeImage(el) {
-    document.getElementById("mainImage").src = el.src;
+<!-- Thêm thư viện SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+/* 🌈 CSS cho thông báo popup */
+.swal2-popup {
+    border-radius: 16px !important;
+    background: #fffaf5 !important;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+    font-family: 'Poppins', sans-serif;
 }
 
-function applyVoucher() {
-    let voucherCode = document.getElementById("voucherCode").value;
-    let currentPrice = <?= $discountedPrice ?>;
-    if (voucherCode === "SALE30") {
-        let newPrice = currentPrice * 0.7;
-        document.getElementById("discountedPrice").textContent = newPrice.toLocaleString() + " VNĐ";
-        alert("Giảm giá thành công!");
-    } else {
-        alert("Mã không hợp lệ!");
+.swal2-title {
+    color: #333 !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+}
+
+.swal2-icon.swal2-success {
+    border-color: #ff7b00 !important;
+    color: #ff7b00 !important;
+}
+
+.swal2-timer-progress-bar {
+    background: #ff7b00 !important;
+}
+
+.swal2-popup.swal2-show {
+    animation: fadeInUp 0.35s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
     }
 }
+</style>
 
+<script>
 $('#addToCartBtn').on('click', function () {
     const id = $(this).data('id');
     const name = $(this).data('name');
@@ -353,13 +381,33 @@ $('#addToCartBtn').on('click', function () {
     }, function (res) {
         if (res.success) {
             $('#cart-count').text(res.totalItems);
-            alert('Đã thêm vào giỏ hàng!');
+
+            Swal.fire({
+                icon: 'success',
+                title: '' + name + ' đã được thêm vào giỏ hàng!',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 1500,
+                timerProgressBar: true,
+                background: '#fffaf5',
+                customClass: { popup: 'swal2-popup' }
+            });
         } else {
-            alert('Thêm vào giỏ thất bại!');
+            Swal.fire({
+                icon: 'error',
+                title: '❌ Thêm vào giỏ thất bại!',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 1500,
+                background: '#fffaf5'
+            });
         }
     }, 'json');
 });
 </script>
+
 
 <!-- ====================== PHẦN ĐÁNH GIÁ NGƯỜI DÙNG (CHỈ XEM) ====================== -->
 <div class="container product-reviews" style="
