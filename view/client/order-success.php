@@ -199,10 +199,10 @@ include_once __DIR__ . "/../layout/header.php";
         msg.style.color = "#28a745";
         msg.textContent = `Cảm ơn ${name}! Bạn đã đánh giá ${selectedRating} sao.`;
 
-        // Sau 2.5 giây chuyển về trang chủ
+        // Sau 1.5 giây chuyển về trang chủ
         setTimeout(() => {
             window.location.href = "/streetsoul_store1/index.php?review=success";
-        }, 2500);
+        }, 1500);
     }
 
     // Nếu có thông báo từ trang chủ
